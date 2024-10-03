@@ -4,10 +4,15 @@ const { errorController } = require('./middlewares/errorHandling')
 const authRouter = require('./routes/authRoutes')
 const messageRouter = require('./routes/messageRoutes')
 const cuid=require('cuid')
+const cookieParser=require('cookie-parser')
 
 
 const app=express()
 dotenv.config()
+
+
+app.use(express.json())
+app.use(cookieParser())
 
 
 app.use('/auth',authRouter)
