@@ -62,11 +62,12 @@ model Conversation{
 
 
   participantId Int[]
-  participants User[]
-  
-  
   messageId Int[]
+  
+// references to table  
+  participants User[]
   messages Message[]
+  
 
 
   createdAt DateTime @default(now())
