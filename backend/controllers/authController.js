@@ -23,38 +23,58 @@ const login=async(req,res,next)=>{
         if(verifyUser.email){
             const verifyPass=await bcrypt.compare(password,verifyUser.password)
 
-            //token generation
-            const token=generateToken()
             if(verifyPass){
-            
+                //token generation
+                const token=generateToken(verifyUser.id)
+
+
                 const sendingData = await prisma.user.findUnique({
                 where: { id: verifyUser.id },
                 select: { password: false,name:true,email:true,profilePic:true,gender:true },
                     });
 
+                //cookie setting
                 res.cookie('chattoken',token,{maxAge:15*24*60*60*1000,httpOnly:true,sameSite:"strict"})
+                
+                //sending response
                 res.status(200).json({
                     success:true,
-                    data:sendingData
+                    data:sendingData,
+                    token
                 })
             }
         }
+        else{
+         return next(new ErrorHandler('Invalid credentials', 400));
+        }
         
-    } 
-    catch (error) {
+        } 
+         catch (error) {
         next(new ErrorHandler(error.message,400))
-    }
+            }
 }
+
+
+
+
 const logout=async(req,res)=>{
     try {
-        const{email,password}=req.body
-        
+        res.cookie("chattoken",null,{maxAge:0})
+        res.status(200).json({
+            success:true,
+            message:"logout success"
+        })
     } 
+
     catch (error) {
         next(new ErrorHandler(error.message, 400));
         
     }
 }
+
+
+
+
 const signup=async(req,res,next)=>{
     try {
         const {name,email,password,gender}=req.body
@@ -101,6 +121,28 @@ const signup=async(req,res,next)=>{
     }
 }
 
+const profileController=async(req,res,next)=>{
+    try {
+        if(req.user.name){
 
-module.exports={signup,login,logout}
+            const user=req.user
+            res.status(200).json({
+                success:true,
+                data:user
+            })
+        }
+        else{
+            next(new ErrorHandler('please login',400))
+        }
+        } 
+    catch (error) {
+        next(new ErrorHandler(error.message, 400));
+        
+    }
+}
+
+
+
+
+module.exports={signup,login,logout,profileController}
 

@@ -5,6 +5,7 @@ const authRouter = require('./routes/authRoutes')
 const messageRouter = require('./routes/messageRoutes')
 const cuid=require('cuid')
 const cookieParser=require('cookie-parser')
+const cors=require('cors')
 
 
 const app=express()
@@ -13,6 +14,7 @@ dotenv.config()
 
 app.use(express.json())
 app.use(cookieParser())
+app.use(cors())
 
 
 app.use('/auth',authRouter)
